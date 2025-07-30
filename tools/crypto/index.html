@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文显</title>
+	<link rel="icon" href="favicon.ico" type="image/x-icon">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto p-4 max-w-4xl">
+        <header class="my-6 text-center">
+            <h1 class="text-2xl font-bold text-sky-600">文显字符处理工具</h1>
+            <p class="text-gray-600 mt-1">隐蔽 | 兼容 | 易用</p>
+        </header>
+
+        <!-- 双框布局区域 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <!-- 左侧：原始文本区（全量处理） -->
+            <div class="bg-white rounded-lg shadow p-5">
+                <h3 class="font-semibold text-gray-800 mb-3">原始文本</h3>
+                <div id="editor" class="border border-gray-300 rounded p-3 min-h-[180px] focus:ring-2 focus:ring-sky-500 focus:border-transparent" contenteditable="true">
+                    请在此输入文本，点击加密/解密按钮即可处理全部内容
+                </div>
+
+                <div class="flex flex-wrap gap-3 mt-4">
+                    <button id="encryptBtn" class="bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded">
+                        加密
+                    </button>
+                    <button id="decryptBtn" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded">
+                        解密
+                    </button>
+                    <button id="clearBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded">
+                        清空
+                    </button>
+                </div>
+
+                <div id="status" class="mt-3 hidden p-2 rounded text-center text-sm"></div>
+            </div>
+
+            <!-- 右侧：结果展示区 -->
+            <div class="bg-white rounded-lg shadow p-5">
+                <h3 class="font-semibold text-gray-800 mb-3">结果展示</h3>
+                
+                <!-- 加密结果（两种格式） -->
+                <div id="encryptResults" class="space-y-4">
+                    <div>
+                        <label class="block text-xs text-gray-500 mb-1">零宽字符格式</label>
+                        <div id="zeroWidthResult" class="border border-blue-200 bg-blue-50 rounded p-3 min-h-[80px] text-sm font-mono overflow-x-auto" contenteditable="true"></div>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-500 mb-1">组合字符格式</label>
+                        <div id="combiningResult" class="border border-purple-200 bg-purple-50 rounded p-3 min-h-[80px] text-sm font-mono overflow-x-auto" contenteditable="true"></div>
+                    </div>
+                </div>
+                
+                <!-- 解密结果（单格式） -->
+                <div id="decryptResult" class="hidden">
+                    <label class="block text-xs text-gray-500 mb-1">解密结果</label>
+                    <div id="decryptContent" class="border border-green-200 bg-green-50 rounded p-3 min-h-[170px] text-sm" contenteditable="true"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 调试信息与说明 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- 调试信息区域 -->
+            <div class="bg-white rounded-lg shadow p-4">
+                <h3 class="font-semibold text-gray-800 mb-2 text-sm">过程信息</h3>
+                <div class="p-3 bg-gray-50 rounded text-xs text-gray-600 max-h-[120px] overflow-auto">
+                    <pre id="debug-content" class="whitespace-pre-wrap"></pre>
+                </div>
+            </div>
+
+            <!-- 算法说明 -->
+            <div class="bg-white rounded-lg shadow p-4">
+                <h3 class="font-semibold text-gray-800 mb-2 text-sm">使用说明</h3>
+                <ul class="text-xs text-gray-600 list-disc pl-5 mt-1 space-y-1">
+                    <li>左侧输入文本后，直接点击加密/解密按钮处理</li>
+                    <li>加密后右侧显示两种格式：零宽字符（隐蔽性强）和组合字符（兼容性好）</li>
+                    <li>解密时自动识别加密格式，支持两种格式的密文解密</li>
+                    <li>所有结果框均可直接编辑和复制内容</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+	
+	<footer class="my-6 text-center">
+            <p class="text-purple-600 mt-1 font-bold">仅作娱乐，请勿用于专业用途</p>
+    </footer>
+
+    <script>
+        // 定义两套字典
+        const dictionaries = {
+            zeroWidth: {
+                name: '零宽字符',
+                map: {
+                    '0': '\u200B',  // 零宽空格
+                    '1': '\u200C',  // 零宽非连接符
+                    '2': '\u200D',  // 零宽连接符
+                    '3': '\uFEFF'   // 零宽非换行空格（分隔符）
+                }
+            },
+            combining: {
+                name: '组合字符',
+                map: {
+                    '0': '\u0300',  // 重音符号
+                    '1': '\u0301',  // 锐音符号
+                    '2': '\u0302',  // 抑扬符
+                    '3': '\u030C'   // 软音符号（分隔符）
+                }
+            }
+        };
+        
+        // 生成反向映射表
+        for (const dictName in dictionaries) {
+            const dict = dictionaries[dictName];
+            dict.reverseMap = {};
+            for (const key in dict.map) {
+                dict.reverseMap[dict.map[key]] = key;
+            }
+        }
+
+        /**
+         * 字符转10位三进制编码
+         */
+        function charToCode(char) {
+            let code = char.charCodeAt(0);
+            if (code > 59048) code = 59048; // 限制在3^10范围内
+            
+            let result = '';
+            let num = code;
+            
+            if (num === 0) return '0000000000';
+            
+            while (num > 0) {
+                result = (num % 3) + result;
+                num = Math.floor(num / 3);
+            }
+            
+            while (result.length < 10) {
+                result = '0' + result;
+            }
+            
+            return result;
+        }
+        
+        /**
+         * 三进制编码转字符
+         */
+        function codeToChar(codeStr) {
+            if (codeStr.length !== 10) {
+                throw new Error(`编码长度错误: ${codeStr.length}，应为10位`);
+            }
+            
+            let code = 0;
+            for (let i = 0; i < 10; i++) {
+                const digit = parseInt(codeStr[i], 10);
+                if (isNaN(digit) || digit < 0 || digit > 2) {
+                    throw new Error(`无效编码字符: ${codeStr[i]}`);
+                }
+                code = code * 3 + digit;
+            }
+            
+            return String.fromCharCode(code);
+        }
+        
+        /**
+         * 通用加密函数（支持指定字典）
+         */
+        function encryptWithDict(text, dict) {
+            if (!text) return '';
+            
+            let codeSequence = '';
+            for (let i = 0; i < text.length; i++) {
+                codeSequence += charToCode(text[i]) + '3';
+            }
+            
+            let encrypted = '';
+            for (let i = 0; i < codeSequence.length; i++) {
+                encrypted += dict.map[codeSequence[i]];
+            }
+            
+            return `保持${encrypted}练习`;
+        }
+        
+        /**
+         * 加密主函数（同时生成两种格式）
+         */
+        function encrypt(text) {
+            const zeroWidthEncrypted = encryptWithDict(text, dictionaries.zeroWidth);
+            const combiningEncrypted = encryptWithDict(text, dictionaries.combining);
+            
+            // 生成调试信息
+            let debugInfo = "加密过程：\n";
+            debugInfo += `原始文本长度: ${text.length} 字符\n`;
+            debugInfo += `零宽字符格式长度: ${zeroWidthEncrypted.length}\n`;
+            debugInfo += `组合字符格式长度: ${combiningEncrypted.length}\n`;
+            
+            // 只显示前5个字符的编码（避免调试信息过长）
+            const sampleChars = text.slice(0, 5);
+            for (let i = 0; i < sampleChars.length; i++) {
+                const char = sampleChars[i];
+                debugInfo += `字符 '${char}' (Unicode: ${char.charCodeAt(0)}) → 编码: ${charToCode(char)}\n`;
+            }
+            if (text.length > 5) {
+                debugInfo += `... 省略 ${text.length - 5} 个字符的编码信息\n`;
+            }
+            
+            document.getElementById('debug-content').textContent = debugInfo;
+            
+            return {
+                zeroWidth: zeroWidthEncrypted,
+                combining: combiningEncrypted
+            };
+        }
+        
+        /**
+         * 解密函数（自动识别格式）
+         */
+        function decrypt(encryptedText) {
+            // 验证格式
+            if (!encryptedText.startsWith('保持') || !encryptedText.endsWith('练习')) {
+                throw new Error('文本必须以"保持"开头并以"练习"结尾');
+            }
+            
+            // 提取加密部分
+            const encryptedPart = encryptedText.slice(2, -2);
+            if (!encryptedPart) {
+                throw new Error('没有加密内容');
+            }
+            
+            // 调试信息
+            let debugInfo = "解密过程：\n";
+            debugInfo += `加密内容长度: ${encryptedPart.length} 字符\n`;
+            
+            // 自动识别字典（通过首个字符）
+            const firstChar = encryptedPart[0];
+            let selectedDict;
+            
+            if (Object.keys(dictionaries.zeroWidth.reverseMap).includes(firstChar)) {
+                selectedDict = dictionaries.zeroWidth;
+            } else if (Object.keys(dictionaries.combining.reverseMap).includes(firstChar)) {
+                selectedDict = dictionaries.combining;
+            } else {
+                throw new Error(`无法识别的加密格式（首个字符编码: ${firstChar.charCodeAt(0)}）`);
+            }
+            
+            debugInfo += `识别到加密格式: ${selectedDict.name}\n`;
+            
+            // 转换为编码序列
+            let codeSequence = '';
+            for (let i = 0; i < encryptedPart.length; i++) {
+                const char = encryptedPart[i];
+                const code = selectedDict.reverseMap[char];
+                if (code === undefined) {
+                    throw new Error(`位置 ${i} 包含无效的加密字符`);
+                }
+                codeSequence += code;
+            }
+            
+            // 只显示前30个编码字符（避免调试信息过长）
+            debugInfo += `解析的编码序列: ${codeSequence.slice(0, 30)}${codeSequence.length > 30 ? '...' : ''}\n`;
+            
+            // 解析字符
+            const codes = codeSequence.split('3');
+            let decrypted = '';
+            
+            for (let i = 0; i < codes.length; i++) {
+                const code = codes[i];
+                if (code && code.length === 10) {
+                    const char = codeToChar(code);
+                    // 只显示前5个字符的解码信息
+                    if (i < 5) {
+                        debugInfo += `编码 ${code} → 字符 '${char}' (Unicode: ${char.charCodeAt(0)})\n`;
+                    }
+                    decrypted += char;
+                }
+            }
+            
+            if (codes.length > 5) {
+                debugInfo += `... 省略 ${codes.length - 5} 个字符的解码信息\n`;
+            }
+            
+            document.getElementById('debug-content').textContent = debugInfo;
+            return decrypted;
+        }
+        
+        // 工具函数：获取编辑框内的所有文本
+        function getAllText() {
+            return document.getElementById('editor').textContent;
+        }
+        
+        // 显示状态消息
+        function showStatus(message, isError = false) {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = message;
+            statusEl.className = isError 
+                ? 'mt-3 p-2 rounded text-center text-sm bg-red-100 text-red-700' 
+                : 'mt-3 p-2 rounded text-center text-sm bg-green-100 text-green-700';
+        }
+        
+        // 切换结果展示类型（加密/解密）
+        function showEncryptResults() {
+            document.getElementById('encryptResults').classList.remove('hidden');
+            document.getElementById('decryptResult').classList.add('hidden');
+        }
+        
+        function showDecryptResult() {
+            document.getElementById('encryptResults').classList.add('hidden');
+            document.getElementById('decryptResult').classList.remove('hidden');
+        }
+        
+        // 绑定事件
+        document.addEventListener('DOMContentLoaded', () => {
+            // 加密按钮（处理全部文本）
+            document.getElementById('encryptBtn').addEventListener('click', () => {
+                const text = getAllText().trim();
+                if (!text) {
+                    showStatus('请先输入要加密的文本', true);
+                    return;
+                }
+                
+                try {
+                    const results = encrypt(text);
+                    // 显示两种加密结果到右侧框
+                    document.getElementById('zeroWidthResult').textContent = results.zeroWidth;
+                    document.getElementById('combiningResult').textContent = results.combining;
+                    showEncryptResults();
+                    showStatus(`加密成功，已处理 ${text.length} 个字符`);
+                } catch (e) {
+                    showStatus(`加密失败: ${e.message}`, true);
+                }
+            });
+            
+            // 解密按钮（处理全部文本）
+            document.getElementById('decryptBtn').addEventListener('click', () => {
+                const text = getAllText().trim();
+                if (!text) {
+                    showStatus('请先输入要解密的文本', true);
+                    return;
+                }
+                
+                try {
+                    const decrypted = decrypt(text);
+                    // 显示解密结果到右侧框
+                    document.getElementById('decryptContent').textContent = decrypted;
+                    showDecryptResult();
+                    showStatus(`解密成功，得到 ${decrypted.length} 个字符`);
+                } catch (e) {
+                    showStatus(`解密失败: ${e.message}`, true);
+                }
+            });
+            
+            // 清空按钮
+            document.getElementById('clearBtn').addEventListener('click', () => {
+                document.getElementById('editor').textContent = '';
+                document.getElementById('zeroWidthResult').textContent = '';
+                document.getElementById('combiningResult').textContent = '';
+                document.getElementById('decryptContent').textContent = '';
+                document.getElementById('debug-content').textContent = '';
+                showStatus('内容已清空');
+            });
+        });
+    </script>
+</body>
+</html>
