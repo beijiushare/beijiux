@@ -7,4 +7,23 @@ body {
   padding: 20px;
   background-color: #f0f2f5;
   color: #333;
+  font-family: 'Times', 'LXGW', sans-serif;
+}
+
+/* 定义英文字体 */
+@font-face {
+  font-family: 'Times';
+  src: url('../fonts/Times.woff2') format('woff2'),
+       url('../fonts/Times.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* 定义中文字体 */
+@font-face {
+  font-family: 'LXGW';
+  src: url('../fonts/LXGW.woff2') format('woff2'),
+       url('../fonts/LXGW.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
 }

@@ -6,6 +6,7 @@
     <title>文显</title>
 	<link rel="icon" href="favicon.ico" type="image/x-icon">
     <script src="https://cdn.tailwindcss.com"></script>
+	<link rel="stylesheet" href="../../styles/base.css" />
 </head>
 <body class="bg-gray-50 min-h-screen">
     <div class="container mx-auto p-4 max-w-4xl">
@@ -24,13 +25,13 @@
                 </div>
 
                 <div class="flex flex-wrap gap-3 mt-4">
-                    <button id="encryptBtn" class="bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded">
+                    <button id="encryptBtn" class="bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded transition-colors duration-200">
                         加密
                     </button>
-                    <button id="decryptBtn" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded">
+                    <button id="decryptBtn" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded transition-colors duration-200">
                         解密
                     </button>
-                    <button id="clearBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded">
+                    <button id="clearBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded transition-colors duration-200">
                         清空
                     </button>
                 </div>
@@ -63,7 +64,7 @@
         </div>
 
         <!-- 调试信息与说明 -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <!-- 调试信息区域 -->
             <div class="bg-white rounded-lg shadow p-4">
                 <h3 class="font-semibold text-gray-800 mb-2 text-sm">过程信息</h3>
@@ -83,16 +84,149 @@
                 </ul>
             </div>
         </div>
+		
+		<footer class="my-6 text-center">
+        <p class="text-purple-600 mt-1 font-bold">仅作娱乐，请勿用于专业用途</p>
+		<div class="flex flex-wrap justify-center gap-4 md:gap-6 mt-3 mb-4"> 
+			<a href="https://x.beijiu.top/" class="text-gray-600 hover:underline text-sm">插件下载</a>
+			<a href="https://x.beijiu.top/" class="text-gray-500 hover:underline text-sm">更多工具</a>
+			<a href="https://x.beijiu.top/qrcode.webp" class="text-blue-500 font-bold hover:underline text-sm">关注公众号</a>
+        </div>
+		</footer>
+
+        <!-- 隐私政策部分 -->
+        <section class="bg-white rounded-lg shadow p-6 mb-8">
+            <div class="flex justify-between items-center mb-6">
+				<h2 id="zhPolicyTitle" class="text-xl font-bold text-gray-800">隐私政策</h2>
+				<h2 id="enPolicyTitle" class="text-xl font-bold text-gray-800 hidden">Privacy Policy</h2>
+                <button id="langToggle" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded text-sm transition-colors duration-200">
+                    中/En
+                </button>
+            </div>
+            
+            <!-- 中文隐私政策 -->
+            <div id="zhPolicy" class="space-y-4 text-gray-700">
+                <div class="text-sm text-gray-500">
+                    更新日期：<strong>2025/7/31</strong><br>
+                    生效日期：<strong>2025/7/31</strong>
+                </div>
+                
+                <h3 class="text-lg font-semibold text-gray-800 mt-6">导言</h3>
+                <p>
+                    “文显”是一款由“BeijiuX”（以下简称“我们”）提供的<strong>免费字符转换工具</strong>。<br>
+                    本工具的所有服务均在您的设备本地运行，不会收集、存储或传输您的任何隐私信息，也无需注册账号即可使用。我们希望通过本《隐私政策》向您明确上述信息处理原则，以便您更安心地使用服务。
+                </p>
+                <p class="italic">
+                    您使用或继续使用我们的服务，即意味着您知晓并同意本《隐私政策》的全部内容。
+                </p>
+                <p>
+                    如对本《隐私政策》或相关事宜有任何问题，请通过 <strong>beijius@outlook.com</strong> 与我们联系。
+                </p>
+                
+                <h3 class="text-lg font-semibold text-gray-800 mt-6">1. 关于信息收集的说明</h3>
+                <p>
+                    本工具为纯本地运行的字符转换服务，<strong>不收集、不存储任何与您相关的信息</strong>，包括但不限于个人身份信息、设备信息、使用行为数据等。<br>
+                    您无需提供任何个人信息即可完整使用所有功能，不存在因未提供信息而无法使用服务的情况。
+                </p>
+                
+                <h3 class="text-lg font-semibold text-gray-800 mt-6">2. 信息存储的说明</h3>
+                <p>
+                    由于本工具<strong>不收集任何信息</strong>，因此不存在信息存储的情况，也不涉及信息存储的方式、期限、地域等问题。
+                </p>
+                
+                <h3 class="text-lg font-semibold text-gray-800 mt-6">3. 信息安全的说明</h3>
+                <p>
+                    因本工具在您的设备本地运行且不收集任何信息，您的所有操作数据仅存在于您的设备本地，不会通过网络传输，因此不存在信息泄露、丢失或被第三方获取的风险。
+                </p>
+                
+                <h3 class="text-lg font-semibold text-gray-800 mt-6">4. 信息使用的说明</h3>
+                <p>
+                    本工具仅在您的设备本地完成字符转换功能，<strong>不会对任何信息进行使用或加工</strong>，也不会用于任何其他用途（如广告投放、服务优化等）。
+                </p>
+                
+                <h3 class="text-lg font-semibold text-gray-800 mt-6">5. 信息共享的说明</h3>
+                <p>
+                    由于本工具<strong>不收集任何信息</strong>，因此不存在向任何第三方共享、转让或公开披露信息的情况。
+                </p>
+                
+                <h3 class="text-lg font-semibold text-gray-800 mt-6">6. 您的权利</h3>
+                <p>
+                    鉴于本工具不收集任何信息，您无需进行信息查询、删除、更正或撤回授权等操作。如您在使用过程中遇到问题，可通过本政策提供的联系方式与我们沟通。
+                </p>
+                
+                <h3 class="text-lg font-semibold text-gray-800 mt-6">7. 变更</h3>
+                <p>
+                    我们可能适时修订本《隐私政策》的条款。当变更发生时，我们会在版本更新时向您提示新的《隐私政策》，并向您说明生效日期。请您仔细阅读变更后的《隐私政策》内容，<strong>若您继续使用我们的服务，即表示您同意我们按照更新后的《隐私政策》处理相关事宜。</strong>
+                </p>
+                
+                <h3 class="text-lg font-semibold text-gray-800 mt-6">8. 未成年人保护</h3>
+                <p>
+                    本工具为简单的字符转换工具，不涉及任何未成年人不适合的内容。未成年人可在监护人的指导下使用本服务，无需额外提交个人信息或获得授权。
+                </p>
+            </div>
+            
+            <!-- 英文隐私政策 (默认隐藏) -->
+            <div id="enPolicy" class="space-y-4 text-gray-700 hidden">
+                <div class="text-sm text-gray-500">
+                    Last Updated: <strong>July 31, 2025</strong><br>
+                    Effective Date: <strong>July 31, 2025</strong>
+                </div>
+                
+                <h3 class="text-lg font-semibold text-gray-800 mt-6">Introduction</h3>
+                <p>
+                    "Wenxian" is a <strong>free character conversion tool</strong> provided by "BeijiuX" (hereinafter referred to as "we").<br>
+                    All services of this tool run locally on your device and will not collect, store, or transmit any of your private information. No account registration is required to use it. We hope to clarify the above information processing principles through this Privacy Policy so that you can use the service with more confidence.
+                </p>
+                <p class="italic">
+                    Your use or continued use of our services means that you are aware of and agree to all contents of this Privacy Policy.
+                </p>
+                <p>
+                    If you have any questions about this Privacy Policy or related matters, please contact us via <strong>beijius@outlook.com</strong>.
+                </p>
+                
+                <h3 class="text-lg font-semibold text-gray-800 mt-6">1. Explanation of Information Collection</h3>
+                <p>
+                    This tool is a purely locally running character conversion service and <strong>does not collect or store any information related to you</strong>, including but not limited to personal identity information, device information, usage behavior data, etc.<br>
+                    You do not need to provide any personal information to fully use all functions, and there is no situation where you cannot use the service due to not providing information.
+                </p>
+                
+                <h3 class="text-lg font-semibold text-gray-800 mt-6">2. Explanation of Information Storage</h3>
+                <p>
+                    Since this tool <strong>does not collect any information</strong>, there is no information storage, nor does it involve issues such as the method, period, or region of information storage.
+                </p>
+                
+                <h3 class="text-lg font-semibold text-gray-800 mt-6">3. Explanation of Information Security</h3>
+                <p>
+                    Because this tool runs locally on your device and does not collect any information, all your operation data only exists locally on your device and will not be transmitted through the network. Therefore, there is no risk of information leakage, loss, or being obtained by third parties.
+                </p>
+                
+                <h3 class="text-lg font-semibold text-gray-800 mt-6">4. Explanation of Information Use</h3>
+                <p>
+                    This tool only completes the character conversion function locally on your device and <strong>will not use or process any information</strong>, nor will it be used for any other purposes (such as advertising, service optimization, etc.).
+                </p>
+                
+                <h3 class="text-lg font-semibold text-gray-800 mt-6">5. Explanation of Information Sharing</h3>
+                <p>
+                    Since this tool <strong>does not collect any information</strong>, there is no sharing, transfer, or public disclosure of information to any third party.
+                </p>
+                
+                <h3 class="text-lg font-semibold text-gray-800 mt-6">6. Your Rights</h3>
+                <p>
+                    Given that this tool does not collect any information, you do not need to query, delete, correct information, or withdraw authorization. If you encounter problems during use, you can contact us through the contact information provided in this policy.
+                </p>
+                
+                <h3 class="text-lg font-semibold text-gray-800 mt-6">7. Changes</h3>
+                <p>
+                    We may revise the terms of this Privacy Policy from time to time. When changes occur, we will prompt you with the new Privacy Policy when the version is updated and explain the effective date. Please carefully read the content of the revised Privacy Policy. <strong>If you continue to use our services, it means that you agree that we will handle related matters in accordance with the updated Privacy Policy.</strong>
+                </p>
+                
+                <h3 class="text-lg font-semibold text-gray-800 mt-6">8. Protection of Minors</h3>
+                <p>
+                    This tool is a simple character conversion tool and does not involve any content unsuitable for minors. Minors can use this service under the guidance of their guardians without needing to submit additional personal information or obtain authorization.
+                </p>
+            </div>
+        </section>
     </div>
-	
-	<footer class="my-6 text-center">
-            <p class="text-purple-600 mt-1 font-bold">仅作娱乐，请勿用于专业用途</p>
-			<div class="flex justify-center gap-6 mt-1"> 
-				<a href="https://x.beijiu.top/" class="text-gray-600 hover:underline">插件下载</a>
-				<a href="https://x.beijiu.top/" class="text-gray-500 hover:underline">更多工具</a>
-				<a href="https://x.beijiu.top/qrcode.webp" class="text-blue-500 font-bold hover:underline">关注公众号</a>
-    </div>
-    </footer>
 
     <script>
         // 定义两套字典
@@ -316,8 +450,32 @@
             document.getElementById('decryptResult').classList.remove('hidden');
         }
         
+        // 语言切换功能
+        function setupLanguageToggle() {
+			const langToggle = document.getElementById('langToggle');
+			// 政策内容元素
+			const zhPolicy = document.getElementById('zhPolicy');
+			const enPolicy = document.getElementById('enPolicy');
+			// 标题元素
+			const zhPolicyTitle = document.getElementById('zhPolicyTitle');
+			const enPolicyTitle = document.getElementById('enPolicyTitle');
+    
+			langToggle.addEventListener('click', () => {
+				// 切换政策内容显示状态
+				zhPolicy.classList.toggle('hidden');
+				enPolicy.classList.toggle('hidden');
+				// 同步切换标题显示状态（与内容保持一致）
+				zhPolicyTitle.classList.toggle('hidden');
+				enPolicyTitle.classList.toggle('hidden');
+			});
+        }
+		
+        
         // 绑定事件
         document.addEventListener('DOMContentLoaded', () => {
+            // 初始化语言切换
+            setupLanguageToggle();
+            
             // 加密按钮（处理全部文本）
             document.getElementById('encryptBtn').addEventListener('click', () => {
                 const text = getAllText().trim();
