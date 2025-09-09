@@ -2,14 +2,7 @@ html {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-body {
-  margin: 0;
-  padding: 20px;
-  background-color: #f0f2f5;
-  color: #333;
-  font-family: 'Times', 'LXGW', sans-serif;
-}
-
+/* 修改字体加载策略，添加font-display: swap避免阻塞 */
 /* 定义英文字体 */
 @font-face {
   font-family: 'Times';
@@ -17,6 +10,7 @@ body {
        url('../fonts/Times.woff') format('woff');
   font-weight: normal;
   font-style: normal;
+  font-display: swap; /* 允许使用系统字体作为回退，直到自定义字体加载完成 */
 }
 
 /* 定义中文字体 */
@@ -26,4 +20,14 @@ body {
        url('../fonts/LXGW.woff') format('woff');
   font-weight: normal;
   font-style: normal;
+  font-display: swap; /* 允许使用系统字体作为回退 */
+}
+
+/* 保留其他原有样式 */
+body {
+  margin: 0;
+  padding: 20px;
+  background-color: #f0f2f5;
+  color: #333;
+  font-family: 'Times', 'LXGW', sans-serif;
 }
