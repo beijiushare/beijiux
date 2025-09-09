@@ -30,11 +30,9 @@ const contentData = {
   "5_本站特供": {
     "index": "5_0.md",
     "1_浏览器扩展": {
-      "index": "5_1.md",
       "dataFile": "datadetail/5_1.json"
     },
     "2_脚本": {
-      "index": "5_2.md"
     }
   }
 };
